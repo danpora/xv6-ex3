@@ -144,6 +144,52 @@ lcr3(uint val)
   asm volatile("movl %0,%%cr3" : : "r" (val));
 }
 
+// ** dan ** //
+// return 0 if cas not succeeded, 1 otherwise
+static inline int 
+cas(volatile int *addr, int expected, int newval)
+{
+
+    int val;
+
+    asm volatile ("lock; cmpxchgl %2, %1; pushfl; popl %0"
+                    : "=a" (val), "=m" (*addr)
+                    : "r" (newval), "m" (*addr), "0" (expected));
+
+    return 64 & val;
+}
+
+// static inline int 
+// cas(volatile int *addr, int expected, int newval)
+// {
+// 	//int eflags;
+// 	// int x =25;
+// 	// int *p = &x;
+
+//   int z =39;
+//   int *w = &z;
+
+//   asm volatile("mov %0, %%eax"
+// 		      :
+// 		      : "r" (*w));	
+
+//   asm volatile("mov %0, %%ebx"
+// 		      :
+// 		      : "r" (*addr));	
+
+//   asm volatile("mov %0, %%ecx"
+//           :
+//           : "r" (*addr));	
+
+// 	asm volatile("lock; cmpxchgl %3, (%2)"
+//                 : 
+//                 : );
+
+// 	//asm volatile("lock; pushfl; popl %0" : "=r" (eflags));
+// 	register int foo asm ("%ebx");
+// 	return foo;
+// }
+
 //PAGEBREAK: 36
 // Layout of the trap frame built on the stack by the
 // hardware and by trapasm.S, and passed to trap().
